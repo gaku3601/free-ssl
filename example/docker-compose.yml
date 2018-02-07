@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+    nginx:
+        build:
+            context: ../
+            dockerfile: Dockerfile
+        ports:
+            - 80:80
+            - 443:443
+        links:
+            - nginx2
+        environment:
+            MAIL: 'pro.gaku@gmail.com' # your mail address
+            DOMAIN: 'takuto.gakusmemo.com' # site domain
+            STAGE: 'staging' # staging or production
+            REVERSE_PROXY: 'http://nginx2'
+    nginx2:
+        image: nginx:1.13.8
