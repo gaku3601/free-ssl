@@ -15,5 +15,7 @@ services:
             DOMAIN: 'takuto.gakusmemo.com' # site domain
             STAGE: 'staging' # staging or production
             REVERSE_PROXY: 'http://nginx2'
+            PORT: 80
+            SSLPORT: 443
     nginx2:
         image: nginx:1.13.8
