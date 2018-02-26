@@ -10,11 +10,12 @@ services:
             - 443:443
         links:
             - nginx2
+            - nginx3
         environment:
             MAIL: 'pro.gaku@gmail.com' # your mail address
             DOMAIN: 'takuto.gakusmemo.com' # site domain
             STAGE: 'staging' # staging or production
-            REVERSE_PROXY: '/->http://nginx2, /management->http://nginx3'
+            REVERSE_PROXY: '/->http://nginx2/, /management/->http://nginx3/'
     nginx2:
         image: nginx:1.13.8
     nginx3:
