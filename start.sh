@@ -4,16 +4,33 @@ else
     echo "SSL Certificate Folder is Not Fonund"
     # 証明書の発行
     if [ $STAGE = "production" ]; then
-        echo "This is Production" 
+        echo "This is Production"
         certbot certonly --webroot --webroot-path /usr/share/nginx/html/ssl -d $DOMAIN -m $MAIL --agree-tos -n
     else
-        echo "This is Staging" 
+        echo "This is Staging"
         certbot certonly --test-cert --webroot --webroot-path /usr/share/nginx/html/ssl -d $DOMAIN -m $MAIL --agree-tos -n
     fi
     # nginxの設定
     mv /etc/nginx/conf.d/default.ssl.conf~ /etc/nginx/conf.d/default.ssl.conf
+    #プロキシ設定
+    proxy=$(echo $REVERSE_PROXY | tr ',' ' ')
+    for val in ${proxy[@]};
+    do
+      echo ${val}
+      v=$(echo $val | tr '\->' ' ')
+      data=()
+      for val2 in ${v[@]};
+      do
+        data+=($val2)
+      done
+      echo ${data[0]} # path
+      echo ${data[1]} # url
+      sed -i -e "$ i location ${data[0]} {\nproxy_pass ${data[1]};\n}" /etc/nginx/conf.d/default.ssl.conf
+    done
+
+
     sed -i -e "s/convert_domain/$DOMAIN/g" /etc/nginx/conf.d/default.ssl.conf
-    sed -i -e "s|convert_pass|$REVERSE_PROXY|g" /etc/nginx/conf.d/default.ssl.conf
+    #sed -i -e "s|convert_pass|$REVERSE_PROXY|g" /etc/nginx/conf.d/default.ssl.conf
     supervisorctl restart nginx
 fi
 
