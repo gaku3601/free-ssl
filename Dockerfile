@@ -6,6 +6,7 @@ MAINTAINER gaku3601
 RUN apt-get update
 RUN apt-get install -y supervisor cron
 RUN apt-get install -y letsencrypt
+RUN apt-get install -y apache2-utils
 
 # 環境変数設定
 ENV TZ=Asia/Tokyo

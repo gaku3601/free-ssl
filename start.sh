@@ -12,6 +12,10 @@ else
     fi
     # nginxの設定
     mv /etc/nginx/conf.d/default.ssl.conf~ /etc/nginx/conf.d/default.ssl.conf
+    # basic認証設定
+    if [ $BASIC_AUTH = "true" ]; then
+      htpasswd -c -b /etc/nginx/conf.d/.htpasswd $BASIC_USER $BASIC_PASSWORD
+    fi
     #プロキシ設定
     proxy=$(echo $REVERSE_PROXY | tr ',' ' ')
     for val in ${proxy[@]};
@@ -25,7 +29,12 @@ else
       done
       echo ${data[0]} # path
       echo ${data[1]} # url
-      sed -i -e "$ i location ${data[0]} {\nproxy_pass ${data[1]};\n}" /etc/nginx/conf.d/default.ssl.conf
+      # basic認証をかけるかかけないかで追記内容を変更
+      if [ $BASIC_AUTH = "true" ]; then
+        sed -i -e "$ i location ${data[0]} {\nproxy_pass ${data[1]};\n auth_basic 'Restricted';\n auth_basic_user_file /etc/nginx/conf.d/.htpasswd;\n}" /etc/nginx/conf.d/default.ssl.conf
+      else
+        sed -i -e "$ i location ${data[0]} {\nproxy_pass ${data[1]};\n}" /etc/nginx/conf.d/default.ssl.conf
+      fi
     done
 
 
